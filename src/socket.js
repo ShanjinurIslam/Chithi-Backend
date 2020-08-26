@@ -8,7 +8,13 @@ function chat_socket(server){
         userSocket.on("send_message", (data) => {
             userSocket.broadcast.emit("receive_message", data)
         })
+
+        userSocket.on('msg',(data)=>{
+            console.log(data)
+        })
     })
+
+    
 }
 
 module.exports = chat_socket
