@@ -1,5 +1,5 @@
 const socketio = require('socket.io')
-const { addUser } = require('../../Works/Stack/NodeJS/src/utils/users')
+const { addUser } = require('./utils/users')
 
 
 function chat_socket(server){
