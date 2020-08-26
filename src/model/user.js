@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const autoincrement = require('mongoose-auto-increment')
+const autoIncrement = require('mongoose-auto-increment')
 
 autoIncrement.initialize(mongoose.connection);
 
@@ -38,7 +38,7 @@ const UserSchema = new mongoose.Schema({
     }]
 })
 
-UserSchema.plugin(autoincrement.plugin,'User')
+UserSchema.plugin(autoIncrement.plugin,'User')
 
 UserSchema.methods.generateAuthToken = async function(){
     const user = this
@@ -98,3 +98,5 @@ UserSchema.pre('save', async function(next) {
 })
 
 const User = mongoose.model('User',UserSchema)
+
+module.exports = User
