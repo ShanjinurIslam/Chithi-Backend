@@ -1,21 +1,19 @@
-const express = require('express')
-const http = require('https');
-
-const api_router = require('./routers/api')
-const socket = require('./socket')
-
-app = express()
+const app = require('express')()
+const http = require('http')
 
 server = http.createServer(app)
 
-socket(server)
-
-app.use('/api',api_router)
-
-app.get('/',(req,res)=>{
-    return res.status(200).send('Welcome to Chithi Backend')
+app.get('/', (req, res) => {
+    res.send("Node Server is running. Yay!!")
 })
 
-server.listen(process.env.PORT,()=>{
-    console.log("Server started at port ",process.env.PORT)
+//Socket Logic
+const socketio = require('socket.io')(http)
+
+socketio.on("connection", (userSocket) => {
+    userSocket.on("send_message", (data) => {
+        userSocket.broadcast.emit("receive_message", data)
+    })
 })
+
+server.listen(process.env.PORT)
