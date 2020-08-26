@@ -13,7 +13,7 @@ function chat_socket(server){
                 // no nothing
             }
             else{
-                io.broadcast.emit('newUser',user)
+                userSocket.emit('newUser',user)
             }
         })
         
