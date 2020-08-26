@@ -7,8 +7,8 @@ function chat_socket(server){
 
     io.on("connection",(userSocket)=>{
         console.log('New user joined')
-        userSocket.on('join',(id)=>{
-            const {error,user} = addUser(id,userSocket.id)
+        userSocket.on('join',async(id)=>{
+            const {error,user} = await addUser(id,userSocket.id)
             
             if(error){
                 console.log(error)
@@ -25,8 +25,7 @@ function chat_socket(server){
         })
 
         userSocket.on('disconnect',()=>{
-            const user = removeUser(userSocket.id)
-            console.log(user)
+            removeUser(userSocket.id)
             console.log('User disconnected')
         })
     })

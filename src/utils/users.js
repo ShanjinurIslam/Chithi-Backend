@@ -3,18 +3,16 @@ const users = []
 
 const addUser = async(userId,socketId)=>{
 
-    const existingUser = users.find((user)=>{
+    const index = users.findIndex((user)=>{
         return user._id == userId
     })
 
-    if(existingUser){
+    if(index!=-1){
         return {
-            error:'User already connected'
+            error:'User already exists'
         }
     }
-    
     const user = await User.findById(userId)
-    console.log(user._id)
 
     if(!user){
         return {
@@ -22,16 +20,14 @@ const addUser = async(userId,socketId)=>{
         }
     }
     else{
-        var object = user
-        delete object.tokens
-        delete object.password
-        delete object.createdAt
-        delete object.updatedAt
+        var object = new Object()
+        object._id = user._id
+        object.username = user.username
         object['socketId'] = socketId
-        
+
         users.push(object)
 
-        return {object}
+        return {user:object}
     }
 }
 
