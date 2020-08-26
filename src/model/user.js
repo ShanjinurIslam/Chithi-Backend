@@ -50,9 +50,11 @@ UserSchema.methods.generateAuthToken = async function(){
 
 UserSchema.methods.checkAuth = function(token) {
     const user = this
-    const index = user.tokens((e)=>{
-        return e == token
+    const index = user.tokens.findIndex((each)=>{
+        return each.token == token
     })
+
+    console.log(index)
 
     if(index != -1){
         return true
@@ -60,6 +62,20 @@ UserSchema.methods.checkAuth = function(token) {
     else{
         return false
     }
+}
+
+UserSchema.methods.removeToken = async function(token){
+    const user = this
+
+    console.log(user.tokens.length)
+
+    const tokens = user.tokens.filter((each)=>{
+        return each.token != token
+    })
+    user.tokens = tokens
+    await user.save()
+
+    console.log(user.tokens.length)
 }
 
 UserSchema.methods.checkUsername = async function(username) {

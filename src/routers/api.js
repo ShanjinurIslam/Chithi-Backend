@@ -1,8 +1,9 @@
 const express = require('express')
 const User = require('../model/user');
+const jwt = require('jsonwebtoken')
 
 const router = express.Router()
-
+const auth = require('../middleware/auth')
 
 // User CRUD
 
@@ -99,9 +100,13 @@ router.post('/login',async(req,res)=>{
     }
 })
 
-router.post('/logout',async(req,res)=>{
-    // middleware lagbe
-    
+router.post('/logout',auth,async(req,res)=>{
+    const user = req.user
+    const token = req.token
+
+    await user.removeToken(token)
+
+    return res.status(200).send(user);
 })
 
 
