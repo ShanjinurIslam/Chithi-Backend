@@ -34,3 +34,5 @@ const addUser = async(userId)=>{
         return {object}
     }
 }
+
+module.exports = {addUser}
