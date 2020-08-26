@@ -5,12 +5,14 @@ function chat_socket(server){
 
     io.on("connection",(userSocket)=>{
         console.log('New user connected')
+        
         userSocket.on("send_message", (data) => {
+            console.log(data)
             userSocket.broadcast.emit("receive_message", data)
         })
 
-        userSocket.on('msg',(data)=>{
-            console.log(data)
+        userSocket.on('disconnect',()=>{
+            console.log('User disconnected')
         })
     })
 
