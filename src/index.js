@@ -3,17 +3,11 @@ const http = require('http')
 
 server = http.createServer(app)
 
+const socket = require('./socket')
+socket(server)
+
 app.get('/', (req, res) => {
-    res.send("Node Server is running. Yay!!")
-})
-
-//Socket Logic
-const socketio = require('socket.io')(http)
-
-socketio.on("connection", (userSocket) => {
-    userSocket.on("send_message", (data) => {
-        userSocket.broadcast.emit("receive_message", data)
-    })
+    res.send("Welcome to Chithi Messeging Application")
 })
 
 server.listen(process.env.PORT)
