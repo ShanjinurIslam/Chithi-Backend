@@ -14,7 +14,7 @@ const addUser = async(userId,socketId)=>{
     }
     
     const user = await User.findById(userId)
-    console.log(user)
+    console.log(user._id)
 
     if(!user){
         return {
@@ -29,7 +29,7 @@ const addUser = async(userId,socketId)=>{
         delete object.updatedAt
         object['socketId'] = socketId
         
-        users.add(object)
+        users.push(object)
 
         return {object}
     }
