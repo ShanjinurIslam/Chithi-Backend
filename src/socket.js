@@ -1,5 +1,5 @@
 const socketio = require('socket.io')
-const { addUser } = require('./utils/users')
+const { addUser,removeUser } = require('./utils/users')
 
 
 function chat_socket(server){
@@ -8,11 +8,13 @@ function chat_socket(server){
     io.on("connection",(userSocket)=>{
         console.log('New user joined')
         userSocket.on('join',(id)=>{
-            const {error,user} = addUser(id)
+            const {error,user} = addUser(id,userSocket.id)
+            
             if(error){
-                // no nothing
+                console.log(error)
             }
             else{
+                console.log(user)
                 userSocket.emit('newUser',user)
             }
         })
@@ -23,6 +25,8 @@ function chat_socket(server){
         })
 
         userSocket.on('disconnect',()=>{
+            const user = removeUser(userSocket.id)
+            console.log(user)
             console.log('User disconnected')
         })
     })

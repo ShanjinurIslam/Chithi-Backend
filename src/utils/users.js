@@ -1,7 +1,7 @@
 const User = require('../model/user')
 const users = []
 
-const addUser = async(userId)=>{
+const addUser = async(userId,socketId)=>{
 
     const existingUser = users.find((user)=>{
         return user._id == userId
@@ -14,6 +14,7 @@ const addUser = async(userId)=>{
     }
     
     const user = await User.findById(userId)
+    console.log(user)
 
     if(!user){
         return {
@@ -26,13 +27,22 @@ const addUser = async(userId)=>{
         delete object.password
         delete object.createdAt
         delete object.updatedAt
+        object['socketId'] = socketId
         
         users.add(object)
-
-        console.log(object)
 
         return {object}
     }
 }
 
-module.exports = {addUser}
+const removeUser = function(socketId){
+    const index = users.findIndex((user)=>{
+        return user.socketId == socketId
+    })
+
+    if(index!=-1){
+        return users.splice(index,1)[0]
+    }
+}
+
+module.exports = {addUser,removeUser}
