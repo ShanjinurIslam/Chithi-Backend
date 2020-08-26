@@ -2,6 +2,12 @@ const jwt = require('jsonwebtoken')
 const User = require('../model/user')
 
 const auth = async(req,res,next)=>{
+    
+
+    if(req.headers['authorization'] == undefined){
+        return res.status(500).send({message:'No token found'})
+    }
+
     const token = req.headers['authorization'].replace('Bearer ','')
     const decoded = jwt.decode(token)
 

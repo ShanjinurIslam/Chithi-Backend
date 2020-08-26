@@ -19,7 +19,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    profileImage:{
+    avatar:{
         type:Buffer
     },
     createdAt: {
@@ -53,9 +53,6 @@ UserSchema.methods.checkAuth = function(token) {
     const index = user.tokens.findIndex((each)=>{
         return each.token == token
     })
-
-    console.log(index)
-
     if(index != -1){
         return true
     }
