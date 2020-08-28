@@ -2,7 +2,6 @@ const User = require('../model/user')
 const users = []
 
 const addUser = async(userId,socketId)=>{
-    console.log(users)
 
     const index = users.findIndex((user)=>{
         return user._id == userId

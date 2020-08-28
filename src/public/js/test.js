@@ -8,6 +8,8 @@ var messages = document.querySelector('#messages')
 var joined = false ;
 var senderID = -1 ;
 
+var current = []
+
 control.addEventListener('click',(e)=>{
     e.preventDefault()
     if(joined){
@@ -39,12 +41,21 @@ control.addEventListener('click',(e)=>{
         socket.on('active_list',(users)=>{
             console.log('active_list found',users)
             for(var i=0;i<users.length;i++){
+                current.push(users[i])
                 activeList.innerHTML += `<h5><${users[i]._id},${users[i].username}></h5>`
             }
         })
 
         socket.on('receive_message',(message)=>{
             messages.innerHTML += `<small>${message.senderID}</small><br/><lead>${message.message}</lead><br/>`
+        })
+
+        socket.on('remove_user',(user)=>{
+            activeList.innerHTML = ''
+            current = current.filter((each)=> each._id != user._id)
+            for(var i=0;i<current.length;i++){
+                activeList.innerHTML += `<h5><${current[i]._id},${current[i].username}></h5>`
+            }
         })
     }
 })

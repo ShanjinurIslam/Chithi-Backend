@@ -4,6 +4,9 @@ const multer = require('multer')
 const sharp = require('sharp')
 const request = require('request')
 
+const ChatThread = require('../model/chat_thread');
+const Message = require('../model/message');
+
 const router = express.Router()
 const auth = require('../middleware/auth')
 
@@ -58,7 +61,6 @@ router.post('/user/create', async (req, res) => {
         res.status(500).send(error.message)
     }
 });
-
 router.post('/user/upload', [auth, upload.single('avatar')], async (req, res) => {
     const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
     req.user.avatar = buffer
@@ -164,6 +166,86 @@ router.post('/logout', auth, async (req, res) => {
 
     return res.status(200).send(user);
 })
+
+
+
+
+router.get('/threads',auth,async(req,res)=>{
+    const threads = req.user.threads
+    const chat_threads = []
+
+    for(var i=0;i<threads.length;i++){
+        const thread = await ChatThread.findOne({threadID:threads[i]})
+        var object = new Object();
+        object['threadID'] = thread.threadID ;
+        const total = thread.messages.length;
+        const lastMessage = await Message.findById(thread.messages[total-1]);
+        object['lastMessage'] = lastMessage
+        chat_threads.push(object)
+    }
+
+    res.status(200).send(chat_threads);
+})
+
+router.get('/threads/:threadID',auth,async(req,res)=>{
+    const threadID = req.params.threadID
+    
+    try{
+        var object = new Object()
+        const thread = await ChatThread.findOne({threadID:threadID})
+        object['threadID'] = threadID
+        const messages = []
+        for(var i=0;i<thread.messages.length;i++){
+            const message = await Message.findById(thread.messages[i])
+            messages.push(message)
+        }
+        object['messages'] = messages
+        res.status(200).send(object);
+    }catch(error){
+        return res.status(500).send(error)
+    }
+})
+
+router.post('/store_message',auth,async (req,res)=>{
+    const rec_user = await User.findById(req.body.receiver)
+
+    var sender = new Object()
+    sender['_id'] = req.user._id
+    sender['username'] = req.user.username
+
+    var receiver = new Object()
+    receiver['_id'] = rec_user._id
+    receiver['username'] = rec_user.username
+
+    console.log({sender:sender,receiver:receiver,content:req.body.content})
+
+    const index = req.user.checkThreadExists(req.body.threadID)
+
+    var thread = null
+    if(index==-1){
+        thread = new ChatThread({threadID:req.body.threadID})
+        await thread.save()
+
+        req.user.threads = req.user.threads.concat(req.body.threadID)
+        rec_user.threads = rec_user.threads.concat(req.body.threadID)
+
+        await req.user.save()
+        await rec_user.save()
+    }
+    else{
+        thread = await ChatThread.findOne({threadID:req.body.threadID})
+    }
+
+    const message = new Message({sender:sender,receiver:receiver,content:req.body.content})
+    await message.save()
+
+    thread.messages = thread.messages.concat(message)
+    await thread.save()
+    
+    return res.status(200).send()
+})
+
+
 
 
 module.exports = router

@@ -6,8 +6,8 @@ function chat_socket(server){
     const io = socketio(server)
 
     io.on("connection",(userSocket)=>{
+        console.log('New user connected')
         userId = userSocket.handshake.query.id
-        
         userSocket.join(userId,async()=>{
             userSocket.emit('active_list',getUsers())
             const {error,user} = await addUser(userId,userSocket.id)
@@ -18,14 +18,15 @@ function chat_socket(server){
                 userSocket.broadcast.emit('new_user',user)
             }
         })
-
+        /*
         userSocket.on('send_message',(object)=>{
             const receiverID = object.receiverID ;
             userSocket.to(receiverID).emit('receive_message',object)
         })
-
+        */
         userSocket.on('disconnect',()=>{
-            removeUser(userSocket.id)
+            const user = removeUser(userSocket.id)
+            io.emit('remove_user',user)
             console.log('User disconnected')
         })
     })

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const autoIncrement = require('mongoose-auto-increment')
+const autoIncrement = require('mongoose-auto-increment');
 
 autoIncrement.initialize(mongoose.connection);
 
@@ -30,6 +30,10 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         default: Date.now()
     },
+    threads: [{
+        type: String,
+        required: true,
+    }],
     tokens: [{
         token: {
             type:String,
@@ -46,6 +50,14 @@ UserSchema.methods.generateAuthToken = async function(){
     user.tokens = user.tokens.concat({ token })
     await user.save()
     return token
+}
+
+UserSchema.methods.checkThreadExists = function(threadID){
+    const user = this
+    const index = user.threads.findIndex((each)=>{
+        return each == threadID
+    })
+    return index ;
 }
 
 UserSchema.methods.checkAuth = function(token) {

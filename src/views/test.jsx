@@ -2,6 +2,8 @@ var React = require('react');
 var BaseLayout = require('./layouts/base');
 const { Row, Col, Container, Form, FormGroup, Button } = require('react-bootstrap');
 
+
+
 function MessageForm(props) {
     return (
         <Form>
