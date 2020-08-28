@@ -35,11 +35,11 @@ app.use('/',adminRouter)
 
 const port = process.env.PORT || 3000;
 
-/*
+
 server.listen(port, '127.0.0.1', function() {
     server.close(function() {
         server.listen(port, '192.168.0.101')
     })
-})*/
-
-server.listen(port)
+})
+/*
+server.listen(port)*/

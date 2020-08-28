@@ -22,8 +22,8 @@ const upload = multer({
 
 router.post('/user/create', async (req, res) => {
     try{
-        var existingUser = await User.find({username:req.username})
-
+        var existingUser = await User.findOne({username:req.body.username})
+        console.log(existingUser)
         if(existingUser){
             throw new Error('User already exists')
         }
