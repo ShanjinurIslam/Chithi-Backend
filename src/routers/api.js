@@ -21,10 +21,18 @@ const upload = multer({
 // User CRUD
 
 router.post('/user/create', async (req, res) => {
-    console.log(req.body)
+    try{
+        var existingUser = await User.find({username:req.username})
+
+        if(existingUser){
+            throw new Error('User already exists')
+        }
+    }catch(error){
+        return res.status(500).send(error.message)
+    }
+
     try {
         const user = new User(req.body)
-
         request({
             url: 'https://ui-avatars.com/api/?name=' +
             user.username +
@@ -46,8 +54,8 @@ router.post('/user/create', async (req, res) => {
             return res.status(200).send(object)
         });
     } catch (error) {
-        console.log(error)
-        res.status(500).send({ 'message': error.message })
+        //console.log(error)
+        res.status(500).send(error.message)
     }
 });
 
@@ -57,7 +65,7 @@ router.post('/user/upload', [auth, upload.single('avatar')], async (req, res) =>
     await req.user.save()
     return res.status(200).send()
 }, (error, req, res, next) => {
-    res.status(500).send({ 'message': error.message })
+    res.status(500).send(error.message)
 });
 
 router.delete('/user/upload', auth, async (req, res) => {
@@ -67,7 +75,7 @@ router.delete('/user/upload', auth, async (req, res) => {
         await req.user.save()
         res.status(200).send()
     } catch (error) {
-        res.status(500).send({ 'message': error.message })
+        res.status(500).send(error.message)
     }
 })
 
@@ -82,7 +90,7 @@ router.get('/user/avatar/:id', async (req, res) => {
         res.send(user.avatar)
 
     } catch (error) {
-        res.status(500).send({ 'message': error.message })
+        res.status(500).send(error.message)
     }
 })
 
@@ -93,7 +101,7 @@ router.get('/user/read', auth, async (req, res) => {
         return res.status(200).send(user)
     } catch (error) {
         console.log(error)
-        res.status(500).send({ 'message': error.message })
+        res.status(500).send(error.message)
     }
 
 });
@@ -113,7 +121,7 @@ router.patch('/user/update', auth, async (req, res) => {
         await user.save()
         res.status(200).send(user)
     } catch (error) {
-        res.status(500).send({ 'message': error.message })
+        res.status(500).send(error.message)
     }
 });
 
@@ -125,7 +133,7 @@ router.delete('/user/delete/:id', async (req, res) => {
         }
         return res.status(200).send({ 'message': 'User deleted' })
     } catch (error) {
-        res.status(500).send({ 'message': error.message })
+        res.status(500).send(error.message)
     }
 })
 
@@ -144,15 +152,13 @@ router.post('/login', async (req, res) => {
 
         return res.status(200).send(object)
     } catch (error) {
-        res.status(500).send({ 'message': error.message })
+        res.status(500).send(error.message)
     }
 })
 
 router.post('/logout', auth, async (req, res) => {
     const user = req.user
     const token = req.token
-
-
 
     await user.removeToken(token)
 
