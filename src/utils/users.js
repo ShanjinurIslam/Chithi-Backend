@@ -2,6 +2,7 @@ const User = require('../model/user')
 const users = []
 
 const addUser = async(userId,socketId)=>{
+    console.log(users)
 
     const index = users.findIndex((user)=>{
         return user._id == userId
@@ -20,6 +21,7 @@ const addUser = async(userId,socketId)=>{
         }
     }
     else{
+        
         var object = new Object()
         object._id = user._id
         object.username = user.username
@@ -29,6 +31,10 @@ const addUser = async(userId,socketId)=>{
 
         return {user:object}
     }
+}
+
+const getUsers = function(){
+    return users;
 }
 
 const removeUser = function(socketId){
@@ -41,4 +47,4 @@ const removeUser = function(socketId){
     }
 }
 
-module.exports = {addUser,removeUser}
+module.exports = {addUser,getUsers,removeUser}

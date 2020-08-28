@@ -6,13 +6,13 @@ function MessageForm(props) {
     return (
         <Form>
             <FormGroup>
-                <input id="username" className="form-control" placeholder="Username" ></input>
+                <input id="userID" className="form-control" placeholder="User ID" ></input>
             </FormGroup>
             <FormGroup>
-                <textarea id="message" className="form-control" rows="5" placeholder="Enter Your Message"></textarea>
+                <textarea hidden={true} id="messageBox" className="form-control" rows="5" placeholder="Enter Your Message"></textarea>
             </FormGroup>
             <FormGroup>
-                <button id="sendButton" className="btn btn-primary btn-block"><b>Send</b></button>
+                <button id="control" className="btn btn-primary btn-block"><b>Join</b></button>
             </FormGroup>
         </Form>
     )
@@ -25,30 +25,29 @@ class Broadcast extends React.Component {
 
     render() {
         return (
-            <BaseLayout title={this.props.title} script="/static/js/broadcast.js">
+            <BaseLayout title={this.props.title} myScript="/js/test.js">
                 <Container className="text-start" style={{ paddingTop: "5%" }}>
-                    <h2>Welcome to User Broadcast Service</h2>
+                    <h2>Socket Test Center</h2>
                     <br />
                     <Row>
                         <Col className="col-sm-8">
-                            <h3>Send Message</h3>
+                            <h4 id='intro_title'>Enter your ID</h4>
                             <MessageForm></MessageForm>
                         </Col>
                         <Col className="text-right">
-                            <h3>Notifications</h3>
-                            <div className="overflow-auto" id="notifications"></div>
+                            <h3>Active Users</h3>
+                            <div className="overflow-auto" id="activeList">
+
+                            </div>
                         </Col>
                     </Row>
                     <Row>
                         <Col>
                             <h3>Chat Room</h3>
                         </Col>
-                        <Col className="text-right">
-                            <button hidden id="serverActive" className="btn btn-outline-success">Server Running</button>
-                        </Col>
                     </Row>
                     <br />
-                    <p id="broadcast_message"></p>
+                    <p id="messages"></p>
                 </Container>
             </BaseLayout>
         )

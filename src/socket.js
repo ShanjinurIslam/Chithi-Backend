@@ -1,27 +1,27 @@
 const socketio = require('socket.io')
-const { addUser,removeUser } = require('./utils/users')
+const { addUser,getUsers, removeUser } = require('./utils/users')
 
 
 function chat_socket(server){
     const io = socketio(server)
 
     io.on("connection",(userSocket)=>{
-        console.log('New user joined')
-        userSocket.on('join',async(id)=>{
-            const {error,user} = await addUser(id,userSocket.id)
-            
+        userId = userSocket.handshake.query.id
+        
+        userSocket.join(userId,async()=>{
+            userSocket.emit('active_list',getUsers())
+            const {error,user} = await addUser(userId,userSocket.id)
             if(error){
                 console.log(error)
             }
             else{
-                console.log(user)
-                userSocket.emit('newUser',user)
+                userSocket.broadcast.emit('new_user',user)
             }
         })
-        
-        userSocket.on("send_message", (data) => {
-            console.log(data)
-            userSocket.broadcast.emit("receive_message", data)
+
+        userSocket.on('send_message',(object)=>{
+            const receiverID = object.receiverID ;
+            userSocket.to(receiverID).emit('receive_message',object)
         })
 
         userSocket.on('disconnect',()=>{
