@@ -24,13 +24,13 @@ const upload = multer({
 // User CRUD
 
 router.post('/user/create', async (req, res) => {
-    try{
-        var existingUser = await User.findOne({username:req.body.username})
+    try {
+        var existingUser = await User.findOne({ username: req.body.username })
         console.log(existingUser)
-        if(existingUser){
+        if (existingUser) {
             throw new Error('User already exists')
         }
-    }catch(error){
+    } catch (error) {
         return res.status(500).send(error.message)
     }
 
@@ -38,8 +38,8 @@ router.post('/user/create', async (req, res) => {
         const user = new User(req.body)
         request({
             url: 'https://ui-avatars.com/api/?name=' +
-            user.username +
-            '&size=512',
+                user.username +
+                '&size=512',
             //make the returned body a Buffer
             encoding: null
         }, async function (error, response, body) {
@@ -71,7 +71,7 @@ router.post('/user/upload', [auth, upload.single('avatar')], async (req, res) =>
 });
 
 router.delete('/user/upload', auth, async (req, res) => {
-    
+
     try {
         req.user.avatar = undefined
         await req.user.save()
@@ -170,16 +170,16 @@ router.post('/logout', auth, async (req, res) => {
 
 
 
-router.get('/threads',auth,async(req,res)=>{
+router.get('/threads', auth, async (req, res) => {
     const threads = req.user.threads
     const chat_threads = []
 
-    for(var i=0;i<threads.length;i++){
-        const thread = await ChatThread.findOne({threadID:threads[i]})
+    for (var i = 0; i < threads.length; i++) {
+        const thread = await ChatThread.findOne({ threadID: threads[i] })
         var object = new Object();
-        object['threadID'] = thread.threadID ;
+        object['threadID'] = thread.threadID;
         const total = thread.messages.length;
-        const lastMessage = await Message.findById(thread.messages[total-1]);
+        const lastMessage = await Message.findById(thread.messages[total - 1]);
         object['lastMessage'] = lastMessage
         chat_threads.push(object)
     }
@@ -187,26 +187,41 @@ router.get('/threads',auth,async(req,res)=>{
     res.status(200).send(chat_threads);
 })
 
-router.get('/threads/:threadID',auth,async(req,res)=>{
+router.get('/threads/:threadID', auth, async (req, res) => {
     const threadID = req.params.threadID
-    
-    try{
+
+    try {
         var object = new Object()
-        const thread = await ChatThread.findOne({threadID:threadID})
+        const thread = await ChatThread.findOne({ threadID: threadID })
         object['threadID'] = threadID
         const messages = []
-        for(var i=0;i<thread.messages.length;i++){
+        for (var i = 0; i < thread.messages.length; i++) {
             const message = await Message.findById(thread.messages[i])
             messages.push(message)
         }
         object['messages'] = messages
         res.status(200).send(object);
-    }catch(error){
+    } catch (error) {
         return res.status(500).send(error)
     }
 })
 
-router.post('/store_message',auth,async (req,res)=>{
+router.post('/checkThreadExists', auth, async (req, res) => {
+    const sender = req.user
+    const receiver = await User.findById(req.body.receiver)
+
+    const thread = sender.threads.filter(value => receiver.threads.includes(value))
+    console.log(thread)
+    if (thread.length > 0) {
+        return res.status(200).send(thread[0])
+    }
+    else {
+        return res.status(404).send({ 'message': 'No Common Thread' })
+    }
+
+})
+
+router.post('/store_message', auth, async (req, res) => {
     const rec_user = await User.findById(req.body.receiver)
 
     var sender = new Object()
@@ -217,13 +232,11 @@ router.post('/store_message',auth,async (req,res)=>{
     receiver['_id'] = rec_user._id
     receiver['username'] = rec_user.username
 
-    console.log({sender:sender,receiver:receiver,content:req.body.content})
-
     const index = req.user.checkThreadExists(req.body.threadID)
 
     var thread = null
-    if(index==-1){
-        thread = new ChatThread({threadID:req.body.threadID})
+    if (index == -1) {
+        thread = new ChatThread({ threadID: req.body.threadID })
         await thread.save()
 
         req.user.threads = req.user.threads.concat(req.body.threadID)
@@ -232,16 +245,16 @@ router.post('/store_message',auth,async (req,res)=>{
         await req.user.save()
         await rec_user.save()
     }
-    else{
-        thread = await ChatThread.findOne({threadID:req.body.threadID})
+    else {
+        thread = await ChatThread.findOne({ threadID: req.body.threadID })
     }
 
-    const message = new Message({sender:sender,receiver:receiver,content:req.body.content})
+    const message = new Message({ sender: sender, receiver: receiver, content: req.body.content })
     await message.save()
 
     thread.messages = thread.messages.concat(message)
     await thread.save()
-    
+
     return res.status(200).send()
 })
 

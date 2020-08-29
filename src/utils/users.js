@@ -1,49 +1,49 @@
 const User = require('../model/user')
 const users = []
 
-const addUser = async(userId,socketId)=>{
+const addUser = async (userId, socketId) => {
 
-    const index = users.findIndex((user)=>{
+    const index = users.findIndex((user) => {
         return user._id == userId
     })
 
-    if(index!=-1){
+    if (index != -1) {
         return {
-            error:'User already exists'
+            error: 'User already exists'
         }
     }
     const user = await User.findById(userId)
 
-    if(!user){
+    if (!user) {
         return {
-            error:'User not found'
+            error: 'User not found'
         }
     }
-    else{
-        
+    else {
+
         var object = new Object()
-        object._id = user._id
-        object.username = user.username
+        object['_id'] = user._id
+        object['username'] = user.username
         object['socketId'] = socketId
 
         users.push(object)
 
-        return {user:object}
+        return { user: object }
     }
 }
 
-const getUsers = function(){
+const getUsers = function () {
     return users;
 }
 
-const removeUser = function(socketId){
-    const index = users.findIndex((user)=>{
+const removeUser = function (socketId) {
+    const index = users.findIndex((user) => {
         return user.socketId == socketId
     })
 
-    if(index!=-1){
-        return users.splice(index,1)[0]
+    if (index != -1) {
+        return users.splice(index, 1)[0]
     }
 }
 
-module.exports = {addUser,getUsers,removeUser}
+module.exports = { addUser, getUsers, removeUser }
